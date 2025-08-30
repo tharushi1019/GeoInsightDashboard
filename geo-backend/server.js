@@ -2,6 +2,8 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 require("dotenv").config();
+const { auth } = require('express-oauth2-jwt-bearer');
+
 
 const recordsRoutes = require("./routes/recordsRoutes");
 
@@ -15,8 +17,17 @@ app.use(cors({
 }));
 app.use(express.json());
 
+const checkJwt = auth({
+  audience: process.env.AUTH0_AUDIENCE,
+  issuerBaseURL: process.env.AUTH0_ISSUER_BASE_URL,
+});
+
 // Routes
 app.use("/api/records", recordsRoutes);
+
+// Apply to protected routes
+app.use('/api/records', checkJwt);
+app.use('/api/geo', checkJwt);
 
 // MongoDB Connection
 mongoose.connect(process.env.MONGO_URI)

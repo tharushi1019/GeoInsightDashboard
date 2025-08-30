@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth0 } from "@auth0/auth0-react";
 import api from "../api";
 import CountryCard from "../components/CountryCard";
 import WeatherCard from "../components/WeatherCard";
@@ -13,13 +14,18 @@ export default function Records() {
   const [toast, setToast] = useState("");
   const [undoData, setUndoData] = useState(null); // store record temporarily
   const navigate = useNavigate();
+  const { getAccessTokenSilently } = useAuth0();
 
   const fetchRecords = async () => {
     setLoading(true);
     setError("");
     try {
+      const token = await getAccessTokenSilently();
       const res = await api.get("/records", {
-        headers: { "x-api-key": import.meta.env.VITE_BACKEND_API_KEY },
+        headers: { 
+          Authorization: `Bearer ${token}`,
+          "x-api-key": import.meta.env.VITE_BACKEND_API_KEY 
+        }
       });
       setRecords(res.data || []);
     } catch (err) {
@@ -33,18 +39,21 @@ export default function Records() {
     fetchRecords();
   }, []);
 
-  const handleDelete = (rec) => {
+  const handleDelete = async (rec) => {
     setDeleting(rec._id);
     setUndoData(rec);
     setRecords((prev) => prev.filter((r) => r._id !== rec._id));
-    setToast(`Snapshot deleted! Undo?`);
     
     // Start 5-second timer for actual deletion
     const timer = setTimeout(async () => {
       if (!undoData) return; // if user already undid
       try {
+        const token = await getAccessTokenSilently();
         await api.delete(`/records/${rec._id}`, {
-          headers: { "x-api-key": import.meta.env.VITE_BACKEND_API_KEY },
+          headers: { 
+            Authorization: `Bearer ${token}`,
+            "x-api-key": import.meta.env.VITE_BACKEND_API_KEY 
+          }
         });
         setUndoData(null);
         setToast(""); // hide toast
