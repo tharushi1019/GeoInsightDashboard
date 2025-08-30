@@ -1,7 +1,15 @@
-import express from "express";
-import Record from "../models/Record.js";
+const express = require("express");
+const Record = require("../models/Record");
+const { auth } = require('express-oauth2-jwt-bearer');
 
 const router = express.Router();
+
+// Auth0 middleware configuration
+const jwtCheck = auth({
+  audience: process.env.AUTH0_AUDIENCE,
+  issuerBaseURL: process.env.AUTH0_ISSUER_BASE_URL,
+  tokenSigningAlg: 'RS256'
+});
 
 // Middleware to check API key
 const apiKeyMiddleware = (req, res, next) => {
@@ -13,7 +21,7 @@ const apiKeyMiddleware = (req, res, next) => {
 };
 
 // Create a new record
-router.post("/", apiKeyMiddleware, async (req, res) => {
+router.post("/", jwtCheck, apiKeyMiddleware, async (req, res) => {
   try {
     const record = new Record(req.body);
     const saved = await record.save();
@@ -25,7 +33,7 @@ router.post("/", apiKeyMiddleware, async (req, res) => {
 });
 
 // Get all records (newest first)
-router.get("/", apiKeyMiddleware, async (req, res) => {
+router.get("/", jwtCheck, apiKeyMiddleware, async (req, res) => {
   try {
     const records = await Record.find().sort({ createdAt: -1 });
     res.json(records);
@@ -35,8 +43,24 @@ router.get("/", apiKeyMiddleware, async (req, res) => {
   }
 });
 
+// Get statistics
+router.get("/stats", jwtCheck, apiKeyMiddleware, async (req, res) => {
+  try {
+    const totalRecords = await Record.countDocuments();
+    const uniqueCountries = await Record.distinct("country");
+    
+    res.json({
+      totalRecords,
+      uniqueCountriesCount: uniqueCountries.length
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to fetch statistics" });
+  }
+});
+
 // Delete a record by ID
-router.delete("/:id", apiKeyMiddleware, async (req, res) => {
+router.delete("/:id", jwtCheck, apiKeyMiddleware, async (req, res) => {
   try {
     const deleted = await Record.findByIdAndDelete(req.params.id);
     if (!deleted) return res.status(404).json({ message: "Record not found" });
@@ -47,4 +71,25 @@ router.delete("/:id", apiKeyMiddleware, async (req, res) => {
   }
 });
 
-export default router;
+// Air quality endpoint (placeholder - needs implementation)
+router.get("/geo/airquality", jwtCheck, apiKeyMiddleware, async (req, res) => {
+  try {
+    const { city } = req.query;
+    // This is a placeholder - you'll need to implement actual air quality API integration
+    // For now, returning mock data
+    res.json({
+      results: [
+        {
+          parameter: "pm25",
+          value: Math.floor(Math.random() * 100) + 1,
+          unit: "µg/m³"
+        }
+      ]
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to fetch air quality data" });
+  }
+});
+
+module.exports = router;

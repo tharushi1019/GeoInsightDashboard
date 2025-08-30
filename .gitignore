@@ -142,3 +142,4 @@ vite.config.ts.timestamp-*
 .env
 *.env
 geo-backend/.env
+geo-frontend/.env

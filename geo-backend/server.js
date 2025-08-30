@@ -8,7 +8,11 @@ const recordsRoutes = require("./routes/recordsRoutes");
 const app = express();
 
 // Middlewares
-app.use(cors());
+app.use(cors({
+  origin: process.env.FRONTEND_URL || 'http://localhost:3000', // frontend URL
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-api-key']
+}));
 app.use(express.json());
 
 // Routes
