@@ -10,23 +10,6 @@ A modern full-stack geography-based data aggregation platform that provides comp
 ![Auth0](https://img.shields.io/badge/Auth0-EB5424?style=for-the-badge&logo=auth0&logoColor=white)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)
 
-## 📸 Application Screenshots
-
-### 🔐 Login Page
-*Secure authentication powered by Auth0*
-
-![Login Page](screenshots/login-page.png)
-
-### 🏠 Dashboard
-*Main dashboard showing country data, weather, and air quality information*
-
-![Dashboard](screenshots/dashboard.png)
-
-### 💾 Saved Records
-*User's saved country research data and snapshots*
-
-![Saved Records](screenshots/saved-records.png)
-
 ## ✨ Features
 
 ### 🗺️ **Country Intelligence**
@@ -124,6 +107,23 @@ GeoInsightDashboard/
 ├── package.json                # Root package.json
 └── package-lock.json
 ```
+
+## 📸 Application Screenshots
+
+### 🔐 Login Page
+*Secure authentication powered by Auth0*
+
+![Login Page](screenshots/login-page.png)
+
+### 🏠 Dashboard
+*Main dashboard showing country data, weather, and air quality information*
+
+![Dashboard](screenshots/dashboard.png)
+
+### 💾 Saved Records
+*User's saved country research data and snapshots*
+
+![Saved Records](screenshots/saved-records.png)
 
 ## 🚀 Quick Start
 
